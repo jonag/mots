@@ -1,7 +1,7 @@
 {
   "SERVER_PORT":  "8080",
 
-  "SOCKET_ADDR":  "http://127.0.0.1",
+  "SOCKET_ADDR":  "http://mot.jonag.org",
   "SOCKET_PORT":  1337,
 
   "GRID_PROVIDER": {
