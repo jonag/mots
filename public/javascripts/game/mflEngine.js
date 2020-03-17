@@ -39,11 +39,11 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
     _scoreManager = new Score();
 
     // document.getElementById('gs-loader-text').innerHTML = 'Connecting to the server...';
-    _socket = io.connect((Conf.SOCKET_ADDR + ':' + Conf.SOCKET_PORT), { reconnect: false });
+    _socket = io.connect((Conf.SOCKET_ADDR+':80'), { reconnect: false });
     _socket.on('connect', function() {
-      
+
       console.log('Connection established :)');
-      
+
       // Bind server disconnect event
       _socket.on('disconnect', function (reason) {
         if (reason && reason == 'booted')
@@ -65,7 +65,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
             prepareUserLoginForm(availableLogos);
         }
       });
-      
+
       // Display login screen and bind start button
       _ui.ChangeGameScreen(enumPanels.Login, true);
       document.getElementById('lp-start-btn').onclick = sendPlayerReady;
@@ -77,7 +77,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
       _ui.ChangeGameScreen(enumPanels.Error, true);
       console.log('Cannot connect the web_socket');
     });
-    
+
   }
 
   function prepareUserLoginForm(logoList) {
@@ -115,12 +115,12 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
         monsterNode = document.querySelector('.myMonster'),
         monster;
 
-    // If nick is empty or if it has the default value, 
+    // If nick is empty or if it has the default value,
     if ((nick == '') || (monsterNode == null)) {
       _ui.InfoTooltip(true, 'Vous devez choisir un <strong>pseudo</strong> et un <strong> petit monstre</strong> !', 4000);
       return (false);
     }
-    
+
     monster = parseInt(monsterNode.getAttribute('data-monster-id'), 10);
 
     // Unbind button event to prevent "space click"
@@ -136,10 +136,10 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
 
     // Send player infos to the server
     _socket.emit('userIsReady', { 'nick': nick, 'monster': monster } );
-    
+
     // Bind score update
     _socket.on('score_update', _scoreManager.RefreshScore);
-  
+
     // Finally bind game over event
     _socket.on('game_over', function (winner) {
       _ui.displayGameOver(winner);
@@ -172,7 +172,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
       _ui.InfoTooltip(true, '<strong>Tenez-vous prêt !</strong><br/>Début des hostilités dans <strong>' + (gridEvent.timer--) + '</strong>');
       startTimer = window.setInterval(function () {
         _ui.InfoTooltip(true, '<strong>Tenez-vous prêt !</strong><br/>Début des hostilités dans <strong>' + (gridEvent.timer--) + '</strong>');
-        
+
         // When the timer is over
         if (gridEvent.timer < 0) {
           // Clear timer
@@ -209,7 +209,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
         style = document.createElement('style');
 
     style.type = 'text/css';
-    
+
     if (style.styleSheet)
       style.styleSheet.cssText = css;
     else
@@ -222,5 +222,5 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
   // Load ressources and Start the client !
   console.log('Client started');
   startClient();
-  
+
 });
