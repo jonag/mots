@@ -1,7 +1,7 @@
 {
   "SERVER_PORT":  8080,
 
-  "SOCKET_ADDR":  "http://mots.jonag.org",
+  "SOCKET_ADDR":  "http://mots-ws.jonag.org",
 
   "GRID_PROVIDER": {
     "PROVIDER_NAME": "Metro",
