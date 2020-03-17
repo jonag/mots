@@ -53,23 +53,7 @@ if (process.argv[2]) {
 /** Call when the express server has started */
 async function onServerReady() {
   console.log('Express server listening on port ' + app.get('port'));
-
-  var addresses = getLocalIpAddresses();
-
-  if (addresses.length > 1) {
-    var response = await prompts({
-      type: 'select',
-      name: 'value',
-      message: 'Choose the IP address to use',
-      choices: addresses,
-    });
-
-    // Update socket address with the choosen one
-    config.SOCKET_ADDR = `http://${addresses[response.value]}`;
-  }
-  else {
-    config.SOCKET_ADDR = `http://${addresses[0]}`;
-  }
+  config.SOCKET_ADDR = `http://0.0.0.0`;
 
   console.log(`\n\n\tWaiting for players at ${config.SOCKET_ADDR}:${config.SERVER_PORT}\n\n`);
 

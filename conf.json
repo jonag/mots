@@ -1,5 +1,5 @@
 {
-  "SERVER_PORT":  2121,
+  "SERVER_PORT":  "8080",
 
   "SOCKET_ADDR":  "http://127.0.0.1",
   "SOCKET_PORT":  1337,
