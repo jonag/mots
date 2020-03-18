@@ -8,13 +8,12 @@ var express = require('express'),
     os = require('os'),
     prompts = require('prompts'),
     app   = express(),
-    config  = require('./conf.json'),
 
     _gridNumber = 0;
 
 
 // all environments
-app.set('port', config.SERVER_PORT);
+app.set('port', parseInt(process.env.SERVER_PORT));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -33,7 +32,7 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/conf.json', function(req, res) {
-    res.json({ SOCKET_ADDR: config.SOCKET_ADDR });
+    res.json({ SOCKET_ADDR: process.env.SOCKET_ADDR });
 });
 
 // Start server

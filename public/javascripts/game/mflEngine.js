@@ -25,7 +25,6 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
 
   Conf = JSON.parse(Conf);
 
-
   function startClient () {
     if (typeof io == 'undefined') {
       document.getElementById('ep-text').innerHTML = 'Cannot retreive socket.io file at the address ' + Conf.SOCKET_ADDR + '<br/><br/>Please provide a valid address.';
@@ -39,7 +38,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
     _scoreManager = new Score();
 
     // document.getElementById('gs-loader-text').innerHTML = 'Connecting to the server...';
-    _socket = io.connect((Conf.SOCKET_ADDR+':80'), { reconnect: false });
+    _socket = io.connect((Conf.SOCKET_ADDR), { reconnect: false });
     _socket.on('connect', function() {
 
       console.log('Connection established :)');
