@@ -193,6 +193,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
 
     // Bind get word event
     _socket.on('word_founded', _gridManager.RevealWord);
+    _socket.on('words_found', _gridManager.RevealMultipleWords);
   }
 
   function resetGame() {

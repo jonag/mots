@@ -20,7 +20,7 @@ define(['cursor'], function (Cursor) {
   var _grid,
       _wordValidationCallback,
       _cursor;
-  
+
   function Grid(gridObj, wordValidationCallback) {
     // Save grid object
     _grid = gridObj;
@@ -68,27 +68,27 @@ define(['cursor'], function (Cursor) {
         lineHeight = Math.floor(size / info.nbLines);
         fontSize = Math.floor(lineHeight / 1.8);
         break;
-      
+
       case 4:
         lineHeight = Math.floor(size / info.nbLines);
         fontSize = Math.round(lineHeight / 1.5);
         break;
 
-      default: 
+      default:
         console.log('[ERROR][grid.js] Don\'t know how to display ' + info.nbLines + ' lines frame !!!');
     }
-    
+
     frame.style.lineHeight = lineHeight + 'px';
     frame.style.fontSize = fontSize + 'px';
 
     // Adding description in frame
     for (var i = 0; i < info.nbDesc; i++) {
       descNode = document.createElement('span');
-      
+
       // Insert description and arrow
       descNode.innerHTML = info.desc[i];
       descNode.classList.add('arrow' + info.arrow[i].toString());
-      
+
       frame.appendChild(descNode);
     };
 
@@ -197,7 +197,7 @@ define(['cursor'], function (Cursor) {
       i += jump;
     }
 
-    // Ignore false detection of 1 letter word 
+    // Ignore false detection of 1 letter word
     if (word.length <= 1)
       return (null);
 
@@ -231,7 +231,12 @@ define(['cursor'], function (Cursor) {
     }
   }
 
-  
+  Grid.prototype.RevealMultipleWords = function (words) {
+    for (const word of words) {
+      Grid.prototype.RevealWord(word);
+    }
+  };
+
   /*
   * Function called when a players has found a word. Display it on the grid in the right color
   */
@@ -255,7 +260,7 @@ define(['cursor'], function (Cursor) {
         node.style.cssText += '-webkit-transition-delay: ' + animationDelay + 'ms; transition-delay: ' + animationDelay + 'ms; color: ' + wordObj.color;
         node.classList.add('reveal' + wordObj.axis);
         node.innerHTML = _grid.cases[index].letter;
-        
+
         animationDelay += REVEAL_WORD_ANIM_DELAY;
       }
 
@@ -265,7 +270,7 @@ define(['cursor'], function (Cursor) {
 
 
   /*
-  * Display the grid on the game screen 
+  * Display the grid on the game screen
   */
   Grid.prototype.DisplayGrid = function () {
     var container = document.getElementById('gs-grid-container'),
@@ -304,7 +309,7 @@ define(['cursor'], function (Cursor) {
     window.setTimeout(function () {
       _cursor.RegisterEvents();
     }, 100);
-    
+
   };
 
   /*
@@ -313,8 +318,8 @@ define(['cursor'], function (Cursor) {
   Grid.prototype.resetGrid = function () {
     var container = document.getElementById('gs-grid-container').innerHTML = '';
   };
-  
+
 
   return (Grid);
-  
+
 });
