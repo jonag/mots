@@ -523,10 +523,14 @@ html, body {
 .bloc1, .bloc2 { width: 50%; }
 .bloc3 { width: 33%; }
 .bloc4 { width: 25%; }
+.bloc5 { width: 20%; }
+.bloc6 { width: 16%; }
 
 .bloc1 > .score-bar, .bloc2 > .score-bar { width: 50%; left: 25%; }
 .bloc3 > .score-bar { width: 66%; left: 17%; }
 .bloc4 > .score-bar { width: 90%; left: 5%; }
+.bloc5 > .score-bar { width: 90%; left: 5%; }
+.bloc6 > .score-bar { width: 90%; left: 5%; }
 
 
 .score-bar {
