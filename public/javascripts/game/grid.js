@@ -73,6 +73,11 @@ define(['cursor'], function (Cursor) {
         lineHeight = Math.floor(size / info.nbLines);
         fontSize = Math.round(lineHeight / 1.5);
         break;
+    
+    case 5:
+        lineHeight = Math.floor(size / info.nbLines);
+        fontSize = Math.round(lineHeight / 1.3);
+        break;
 
       default:
         console.log('[ERROR][grid.js] Don\'t know how to display ' + info.nbLines + ' lines frame !!!');
