@@ -58,40 +58,49 @@ function resetGame() {
   });
 }
 
-function playerLog (socket, nick, monsterId) {
+function playerNew(socket, nick, monsterId) {
+  var player = _playersManager.addNewPlayer(socket);
+
+  // Set new player parameters
+  player.setNick(nick);
+  _playersManager.setMonsterToPlayer(player, monsterId);
+
+  // Refresh monster list for unready players
+  _io.sockets.emit('logos', _playersManager.getAvailableMonsters());
+
+  playerLog(socket, player, false);
+}
+
+function playerLog(socket, player, resume) {
   var gridInfos = _gridManager.getGridInfos();
 
-  // Retreive PlayerInstance
-  socket.get('PlayerInstance', function (error, player) {
+  // Remember PlayerInstance and push it to the player list
+  socket.set('PlayerInstance', player);
 
-    if (error)
-      console.error(error);
-    else {
-
-      // Set new player parameters
-      player.setNick(nick);
-      _playersManager.setMonsterToPlayer(player, monsterId);
-      // Refresh monster list for unready players
-      _io.sockets.emit('logos', _playersManager.getAvailableMonsters());
-
-      // Bind found word event
-      socket.on('wordValidation', function (wordObj) {
-        checkWord(player, wordObj);
-      });
-
-      // Notify everyone about the new client
-      sendChatMessage( nick + ' a rejoint la partie !<br/>' + _playersManager.getNumberOfPlayers() + ' joueurs connectés', undefined, undefined, _playersManager.getPlayerList());
-
-      // Send grid informations to the player
-      sendPlayerMessage(socket, 'Grille actuelle: ' + gridInfos.provider + ' ' + gridInfos.id + ' (Niveau ' + gridInfos.level + ')');
-
-      // Si la partie est déjà commencée on transmet la grille au joueur
-      if (_gameState === enums.ServerState.OnGame) {
-        socket.emit('grid_event', { grid: _gridManager.getGrid(), timer: 0});
-        socket.emit('words_found', _wordsFound);
-      }
-    }
+  // Bind found word event
+  socket.on('wordValidation', function (wordObj) {
+    checkWord(player, wordObj);
   });
+
+  socket.emit('player_id', player.getID());
+
+  // Notify everyone about the new client
+  let message;
+  if (resume) {
+    message = `${player.getNick()} est de retour !`;
+  } else {
+    message = `${player.getNick()} a rejoint la partie !<br/> ${_playersManager.getNumberOfPlayers()} joueurs connectés`;
+  }
+  sendChatMessage(message, undefined, undefined, _playersManager.getPlayerList());
+
+  // Send grid informations to the player
+  sendPlayerMessage(socket, 'Grille actuelle: ' + gridInfos.provider + ' ' + gridInfos.id + ' (Niveau ' + gridInfos.level + ')');
+
+  // Si la partie est déjà commencée on transmet la grille au joueur
+  if (_gameState === enums.ServerState.OnGame) {
+    socket.emit('grid_event', { grid: _gridManager.getGrid(), timer: 0});
+    socket.emit('words_found', _wordsFound);
+  }
 }
 
 function bonusChecker(playerPoints, nbWordsRemaining) {
@@ -227,26 +236,39 @@ exports.startMflServer = function (server) {
 
     // If it remains slots in the room, add player and bind events
     if (_playersManager.getNumberOfPlayers() < MAX_PLAYERS) {
-
-      // Add new player
-      var player = _playersManager.addNewPlayer(socket);
-
       // Register to socket events
       socket.on('disconnect', function () {
         // When a player disconnect, retreive player instance
         socket.get('PlayerInstance', function (error, player) {
-          sendChatMessage( player.getNick() + ' a quitté la partie');
-          _playersManager.removePlayer(player);
-          player = null;
-          if (_playersManager.getNumberOfPlayers() < 1) {
-            resetGame();
-          }
+          sendChatMessage(`${player.getNick()} s'est déconnecté. Il sera exclu dans 1 minute.`)
+          player.setOnline(false);
+
+          setTimeout(() => {
+            if (player.getOnline() === true) {
+              return;
+            }
+            const playerNick = player.getNick();
+            _playersManager.removePlayer(player);
+            if (_playersManager.getNumberOfPlayers() < 1) {
+              resetGame();
+            } else {
+              sendChatMessage(`${playerNick} a quitté la partie`, undefined, undefined, _playersManager.getPlayerList());
+            }
+          }, 60000);
         });
 
       });
 
       socket.on('userIsReady', function (infos) {
-        playerLog(socket, infos.nick, infos.monster);
+        playerNew(socket, infos.nick, infos.monster);
+      });
+
+      socket.on('resumeGame', function (infos) {
+        const player = _playersManager.getPlayer(infos.playerId);
+        if (player) {
+          player.setOnline(true);
+          playerLog(socket, player, true);
+        }
       });
 
       socket.on('chat', function (message) {
@@ -258,9 +280,6 @@ exports.startMflServer = function (server) {
           });
         }
       });
-
-      // Remember PlayerInstance and push it to the player list
-      socket.set('PlayerInstance', player);
 
       // Send to the player availables logos
       socket.emit('logos', _playersManager.getAvailableMonsters());

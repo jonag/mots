@@ -9,6 +9,7 @@ function Player (socket, uid) {
       score:      0,
       nbWords:    0,
       progress: 0,
+      online: true,
     };
 };
 
@@ -25,6 +26,8 @@ Player.prototype.getColor = function () { return (this._playerTinyObject.monster
 Player.prototype.getMonster = function () { return (this._playerTinyObject.monster); };
 Player.prototype.getPlayerObject = function () { return (this._playerTinyObject); };
 Player.prototype.getProgress = function () { return (this._playerTinyObject.progress); };
+Player.prototype.getOnline = function () { return (this._playerTinyObject.online); };
+Player.prototype.setOnline = function (online) { this._playerTinyObject.online = online };
 
 Player.prototype.updateScore = function (points, progress) {
   this._playerTinyObject.score += points;

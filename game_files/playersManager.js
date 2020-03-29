@@ -4,8 +4,9 @@ var util          = require('util'),
     enums         = require('./enums'),
     Monsters      = require('./playersLogos').Monsters;
 
-var _playersList      = []
-    _currentPlayerId  = 0;
+const { v4: uuidv4 } = require('uuid');
+
+var _playersList      = [];
 
 
 function PlayersManager () {
@@ -18,7 +19,7 @@ PlayersManager.prototype.addNewPlayer = function (playerSocket) {
   var newPlayer;
 
   // Create new player and add it in the list
-  newPlayer = new Player(playerSocket, _currentPlayerId++);
+  newPlayer = new Player(playerSocket, uuidv4());
   _playersList.push(newPlayer);
 
   console.info('New player connected. There is currently ' + _playersList.length + ' player(s)');
@@ -110,6 +111,10 @@ PlayersManager.prototype.resetPlayersForNewGame = function () {
   for (index in _playersList) {
     _playersList[index].resetPlayerInfos();
   };
+};
+
+PlayersManager.prototype.getPlayer = (playerId) => {
+  return _playersList.find(player => player.getID() === playerId);
 };
 
 module.exports = PlayersManager;

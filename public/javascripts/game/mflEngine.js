@@ -51,6 +51,11 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
         console.log('Connection with the server lost :( ');
       });
 
+      const playerId = localStorage.getItem('player_id');
+      if (playerId) {
+        _socket.emit('resumeGame', {playerId});
+      }
+
       // Bind login event
       _socket.on('logos', function (availableLogos) {
         if (_gameState == enumState.Login) {
@@ -63,9 +68,16 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
         }
       });
 
+      _socket.on('player_id', function(playerId) {
+        localStorage.setItem('player_id', playerId);
+        loggedIn();
+      });
+
       // Display login screen and bind start button
       _ui.ChangeGameScreen(enumPanels.Login, true);
       document.getElementById('lp-start-btn').onclick = sendPlayerReady;
+
+      _socket.on('grid_event', onStartGame);
 
     });
 
@@ -123,16 +135,18 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
     // Unbind button event to prevent "space click"
     document.getElementById('lp-start-btn').onclick = function() { return false; };
 
+    // Send player infos to the server
+    _socket.emit('userIsReady', { 'nick': nick, 'monster': monster } );
+
+    return (false);
+  }
+
+  function loggedIn() {
     // Connect chat
     _chat = new Chat(_socket, _scoreManager.UpdatePlayerList);
 
-    // Bind grid event, meaning the game is about to start !
-    _socket.on('grid_event', onStartGame);
     // Bind also grid reset, to play more than one game :p
     _socket.on('grid_reset', resetGame);
-
-    // Send player infos to the server
-    _socket.emit('userIsReady', { 'nick': nick, 'monster': monster } );
 
     // Bind score update
     _socket.on('score_update', _scoreManager.RefreshScore);
@@ -151,9 +165,7 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
     _ui.bindServerCommandButtons(_socket);
 
     // Set player's color
-    setPlayerColor(monsterNode.style.borderColor);
-
-    return (false);
+    // setPlayerColor(monsterNode.style.borderColor);
   }
 
   function onStartGame(gridEvent) {
