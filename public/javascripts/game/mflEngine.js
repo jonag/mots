@@ -68,17 +68,13 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
         }
       });
 
-      _socket.on('player_id', function(playerId) {
-        localStorage.setItem('player_id', playerId);
-        loggedIn();
+      _socket.on('loggedIn', function(player) {
+        loggedIn(player);
       });
 
       // Display login screen and bind start button
       _ui.ChangeGameScreen(enumPanels.Login, true);
       document.getElementById('lp-start-btn').onclick = sendPlayerReady;
-
-      _socket.on('grid_event', onStartGame);
-
     });
 
     _socket.on('error', function() {
@@ -141,9 +137,14 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
     return (false);
   }
 
-  function loggedIn() {
+  function loggedIn(player) {
+    localStorage.setItem('player_id', player.id);
+
     // Connect chat
     _chat = new Chat(_socket, _scoreManager.UpdatePlayerList);
+
+    // Bind grid event, meaning the game is about to start !
+    _socket.on('grid_event', onStartGame);
 
     // Bind also grid reset, to play more than one game :p
     _socket.on('grid_reset', resetGame);
@@ -165,7 +166,7 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
     _ui.bindServerCommandButtons(_socket);
 
     // Set player's color
-    // setPlayerColor(monsterNode.style.borderColor);
+    setPlayerColor(player.monster.color);
   }
 
   function onStartGame(gridEvent) {

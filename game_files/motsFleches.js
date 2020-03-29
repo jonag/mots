@@ -82,7 +82,7 @@ function playerLog(socket, player, resume) {
     checkWord(player, wordObj);
   });
 
-  socket.emit('player_id', player.getID());
+  socket.emit('loggedIn', player.getPlayerObject());
 
   // Notify everyone about the new client
   let message;
