@@ -7,7 +7,8 @@ function Player (socket, uid) {
       nick:       '',
       monster:    null,
       score:      0,
-      nbWords:    0
+      nbWords:    0,
+      progress: 0,
     };
 };
 
@@ -23,15 +24,18 @@ Player.prototype.getNbWords = function () { return (this._playerTinyObject.nbWor
 Player.prototype.getColor = function () { return (this._playerTinyObject.monster.color); };
 Player.prototype.getMonster = function () { return (this._playerTinyObject.monster); };
 Player.prototype.getPlayerObject = function () { return (this._playerTinyObject); };
+Player.prototype.getProgress = function () { return (this._playerTinyObject.progress); };
 
-Player.prototype.updateScore = function (points) {
+Player.prototype.updateScore = function (points, progress) {
   this._playerTinyObject.score += points;
   this._playerTinyObject.nbWords++;
+    this._playerTinyObject.progress = progress;
 };
 
 Player.prototype.resetPlayerInfos = function () {
   this._playerTinyObject.score = 0;
   this._playerTinyObject.nbWords = 0;
+    this._playerTinyObject.progress = 0;
 };
 
 module.exports = Player;

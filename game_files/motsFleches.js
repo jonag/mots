@@ -150,8 +150,8 @@ function checkWord(player, wordObj) {
     _lastWordFoudTimestamp = new Date().getTime();
 
     // Update player score and notify clients
-    player.updateScore(points + bonuses.points);
-    _io.sockets.emit('score_update', { playerID: player.getID(), score: player.getScore(), words: player.getNbWords(), progress: _gridManager.getAccomplishmentRate(player.getScore(), _playersManager.getNumberOfPlayers()), bonus: bonuses.bonusList } );
+    player.updateScore(points + bonuses.points, _gridManager.getAccomplishmentRate(player.getScore(), _playersManager.getNumberOfPlayers()));
+    _io.sockets.emit('score_update', { playerID: player.getID(), score: player.getScore(), words: player.getNbWords(), progress: player.getProgress(), bonus: bonuses.bonusList } );
 
     if (_gridManager.getNbRemainingWords() <= 0) {
       console.log('[SERVER] Game over ! Sending player\'s notification...');
