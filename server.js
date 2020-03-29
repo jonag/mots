@@ -8,12 +8,13 @@ var express = require('express'),
     os = require('os'),
     prompts = require('prompts'),
     app   = express(),
+    mfl = require('./game_files/motsFleches'),
 
     _gridNumber = 0;
 
 
 // all environments
-app.set('port', parseInt(process.env.SERVER_PORT));
+app.set('port', parseInt(process.env.PORT));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -31,22 +32,11 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/conf.json', function(req, res) {
-    res.json({ SOCKET_ADDR: process.env.SOCKET_ADDR });
-});
 
 // Start server
-http.createServer(app).listen(app.get('port'), onServerReady);
-
-// Retreive command line arguments
-if (process.argv[2]) {
-  // If the user wants the default grid (debug purpose)
-  if ((isNaN(process.argv[2])) && (process.argv[2].toLowerCase() == 'default'))
-    _gridNumber = -1;
-  // Else if the user try to retreive a special grid
-  else if (!isNaN(process.argv[2]))
-    _gridNumber = process.argv[2];
-}
+var server = http.createServer(app);
+mfl.startMflServer(server);
+server.listen(app.get('port'), onServerReady);
 
 /** Call when the express server has started */
 async function onServerReady() {

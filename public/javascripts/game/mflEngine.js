@@ -1,7 +1,7 @@
 /*
 *   Game Engine
 */
-require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], function (Conf, UITools, GridManager, Chat, Score) {
+require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Chat, Score) {
 
   var enumState = {
     Login: 0,
@@ -23,11 +23,9 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
       _socket,
       _grid;
 
-  Conf = JSON.parse(Conf);
-
   function startClient () {
     if (typeof io == 'undefined') {
-      document.getElementById('ep-text').innerHTML = 'Cannot retreive socket.io file at the address ' + Conf.SOCKET_ADDR + '<br/><br/>Please provide a valid address.';
+      document.getElementById('ep-text').innerHTML = 'Cannot retreive socket.io file <br/><br/>Please provide a valid address.';
       _ui.ChangeGameScreen(enumPanels.Error, true);
       console.log('Cannot reach socket.io file !');
       return;
@@ -38,7 +36,7 @@ require(['../lib/text!../../conf.json', 'UITools', 'grid', 'chat', 'score'], fun
     _scoreManager = new Score();
 
     // document.getElementById('gs-loader-text').innerHTML = 'Connecting to the server...';
-    _socket = io.connect((Conf.SOCKET_ADDR), { reconnect: false });
+    _socket = io.connect(`${location.protocol}//${location.hostname}`, { reconnect: false });
     _socket.on('connect', function() {
 
       console.log('Connection established :)');
