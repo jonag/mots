@@ -240,6 +240,10 @@ exports.startMflServer = function (server) {
       socket.on('disconnect', function () {
         // When a player disconnect, retreive player instance
         socket.get('PlayerInstance', function (error, player) {
+          // Si le joueur n'a pas choisi son pseudo/monstre il n'a pas encore d'instance de joueur
+          if (!player) {
+            return;
+          }
           sendChatMessage(`${player.getNick()} s'est déconnecté. Il sera exclu dans 1 minute.`)
           player.setOnline(false);
 
