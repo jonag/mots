@@ -205,6 +205,7 @@ require(['UITools', 'grid', 'chat', 'score'], function (UITools, GridManager, Ch
     // Bind get word event
     _socket.on('word_founded', _gridManager.RevealWord);
     _socket.on('words_found', _gridManager.RevealMultipleWords);
+    _socket.on('hint', _gridManager.RevealLetter);
   }
 
   function resetGame() {
