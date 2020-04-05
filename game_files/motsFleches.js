@@ -7,8 +7,8 @@ var enums           = require('./enums'),
 var MAX_PLAYERS   = 8;
 var SERVER_CHAT_COLOR = '#c0392b';
 var TIME_BEFORE_START = 5;
-var FIRST_HINT_TIMEOUT = 120;
-var NEXT_HINT_TIMEOUT = 30;
+var FIRST_HINT_TIMEOUT = 10;
+var NEXT_HINT_TIMEOUT = 5;
 
 // Parameters
 var _playersManager,
@@ -17,6 +17,7 @@ var _playersManager,
     _gameState,
     _lastWordFoudTimestamp,
     _wordsFound,
+    _hintsSent,
     _hintTimer;
 
 function startGame() {
@@ -28,8 +29,9 @@ function startGame() {
   // Change game state
   _gameState = enums.ServerState.OnGame;
 
-  // RàZ des mots déjà trouvés
+  // RàZ des mots déjà trouvés et des indices
   _wordsFound = [];
+  _hintsSent = [];
 
   // Lancement du timer pour les indices
   _hintTimer = setTimeout(sendHint, FIRST_HINT_TIMEOUT * 1000);
@@ -64,7 +66,8 @@ function sendHint() {
   }
 
   caseHint.available = false;
-  _io.sockets.emit('hint', caseHint);
+  _hintsSent.push(caseHint);
+  _io.sockets.emit('hints', [caseHint]);
 
   _hintTimer = setTimeout(sendHint, NEXT_HINT_TIMEOUT * 1000);
 }
@@ -137,6 +140,7 @@ function playerLog(socket, player, resume) {
   if (_gameState === enums.ServerState.OnGame) {
     socket.emit('grid_event', { grid: _gridManager.getGrid(), timer: 0});
     socket.emit('words_found', _wordsFound);
+    socket.emit('hints', _hintsSent);
   }
 }
 
