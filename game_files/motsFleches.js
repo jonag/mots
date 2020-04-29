@@ -34,6 +34,9 @@ function startGame() {
   _hintsSent = [];
 
   // Lancement du timer pour les indices
+  if (_hintTimer) {
+    clearTimeout(_hintTimer);
+  }
   _hintTimer = setTimeout(sendHint, FIRST_HINT_TIMEOUT * 1000);
 
   // Send grid to clients
@@ -51,25 +54,29 @@ function sendHint() {
     return;
   }
 
-  let word = _gridManager.findWord(caseHint.pos, 0);
-  if (word) {
-    _gridManager.decreaseRemainingWords();
-  }
-  word = _gridManager.findWord(caseHint.pos, 1);
-  if (word) {
-    _gridManager.decreaseRemainingWords();
-  }
-
-  if (_gridManager.getNbRemainingWords() <= 0) {
-    console.log('[SERVER] Game over ! Sending player\'s notification...');
-    _io.sockets.emit('game_over', _playersManager.getWinner().getPlayerObject());
-  }
-
   caseHint.available = false;
   _hintsSent.push(caseHint);
   _io.sockets.emit('hints', [caseHint]);
 
-  _hintTimer = setTimeout(sendHint, NEXT_HINT_TIMEOUT * 1000);
+  let wordFound = false;
+  let word = _gridManager.findWord(caseHint.pos, 0);
+  if (word) {
+    _gridManager.decreaseRemainingWords();
+    wordFound = true;
+  }
+  word = _gridManager.findWord(caseHint.pos, 1);
+  if (word) {
+    _gridManager.decreaseRemainingWords();
+    wordFound = true;
+  }
+
+
+  if (wordFound && _gridManager.getNbRemainingWords() <= 0) {
+    console.log('[SERVER] Game over ! Sending player\'s notification...');
+    _io.sockets.emit('game_over', _playersManager.getWinner().getPlayerObject());
+  } else {
+    _hintTimer = setTimeout(sendHint, NEXT_HINT_TIMEOUT * 1000);
+  }
 }
 
 function resetGame() {
@@ -77,6 +84,11 @@ function resetGame() {
 
   // Reset game state
   _gameState = enums.ServerState.WaitingForPlayers;
+
+  // Annulation timer des indices
+  if (_hintTimer) {
+    clearTimeout(_hintTimer);
+  }
 
   // Reset players
   _playersManager.resetPlayersForNewGame();
@@ -210,6 +222,7 @@ function checkWord(player, wordObj) {
     if (_gridManager.getNbRemainingWords() <= 0) {
       console.log('[SERVER] Game over ! Sending player\'s notification...');
       _io.sockets.emit('game_over', _playersManager.getWinner().getPlayerObject());
+        clearTimeout(_hintTimer);
     }
   }
 }

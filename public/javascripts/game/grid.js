@@ -260,10 +260,13 @@ define(['cursor'], function (Cursor) {
         animationDelay = 0;
 
     for (i = 0; i < size; i++) {
-      // If this letter is a just found
-      revealCase(index, wordObj.word[i], wordObj.color, wordObj.axis, animationDelay);
+      if (_grid.cases[index].available == true) {
+        // If this letter is a just found
+        revealCase(index, wordObj.word[i], wordObj.color, wordObj.axis, animationDelay);
+        animationDelay += REVEAL_WORD_ANIM_DELAY;
+      }
+
       index += jump;
-      animationDelay += REVEAL_WORD_ANIM_DELAY;
     }
   };
 
